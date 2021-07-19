@@ -9,11 +9,7 @@ from .component_models.valve_control import CtrlValve
 if not sys.warnoptions:
     import warnings
 
-def save_network(net, file_path=''):
-    export_network_components(net, type='json_default', path=file_path)
-
 def run_hydraulic_control(net, t, **kwargs):
-    run_control(net, max_iter=100, **kwargs)
     # Ignore user warnings of control
     try:
         run_control(net, max_iter=100, **kwargs)

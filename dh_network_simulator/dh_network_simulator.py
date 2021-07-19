@@ -31,7 +31,7 @@ class DHNetworkSimulator():
         else:
             warnings.warn(f"Logging mode '{self.logging}' does not exist. Logging mode set to 'all'.")
 
-    def load_network(self, from_file=False, path='', format='json_default', net=pandapipesNet):
+    def load_network(self, from_file=False, path='', format='json_default'):
 
         # create empty network
         self.net = pp.create_empty_network("net", add_stdtypes=False)
@@ -52,7 +52,8 @@ class DHNetworkSimulator():
             self._create_heatpump()
             self._create_controllers()
 
-        export_network_components(self.net, format='json_default', path='./resources/dh_network/export/')
+    def save_network(self, path='', format='json_default'):
+        export_network_components(self.net, format=format, path=path)
 
     def run_simulation(self, t, sim_mode='static'):
         # Run hydraulic flow (steady-state)

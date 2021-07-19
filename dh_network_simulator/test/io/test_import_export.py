@@ -6,17 +6,22 @@ from dh_network_simulator.io import export_network_components
 from dh_network_simulator.component_models.valve_control import CtrlValve
 
 
-# def test_import_default():
-#     # create test network
-#     test_net = _create_test_network()
-#
-#     # import network from json file
-#     net = pp.create_empty_network("net", add_stdtypes=False)
-#     pp.create_fluid_from_lib(net, "water", overwrite=True)
-#     import_network_components(net, path='../resources/import/', format='json_default')
-#
-#     # assert
-#     assert net == test_net
+def test_import_default():
+    # create test network
+    test_net = _create_test_network()
+
+    # import network from json file
+    net = pp.create_empty_network("net", add_stdtypes=False)
+    pp.create_fluid_from_lib(net, "water", overwrite=True)
+    net = import_network_components(net, path='../resources/import/', format='json_default')
+
+    # assert
+    assert_frame_equal(net.controller.loc[:, net.controller.columns != 'object'],
+                       test_net.controller.loc[:, test_net.controller.columns != 'object'])
+    assert_frame_equal(net.junction, test_net.junction)
+    assert_frame_equal(net.pipe, test_net.pipe)
+    assert_frame_equal(net.ext_grid, test_net.ext_grid)
+    assert_frame_equal(net.heat_exchanger, test_net.heat_exchanger)
 
 def test_import_json_readable():
     # create test network
@@ -25,7 +30,7 @@ def test_import_json_readable():
     # import network from json file
     net = pp.create_empty_network("net", add_stdtypes=False)
     pp.create_fluid_from_lib(net, "water", overwrite=True)
-    import_network_components(net, path='../resources/import/', format='json_readable')
+    net = import_network_components(net, path='../resources/import/', format='json_readable')
 
     # assert
     assert_frame_equal(net.controller.loc[:, net.controller.columns != 'object'],

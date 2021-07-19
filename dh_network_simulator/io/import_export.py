@@ -16,7 +16,7 @@ def export_network_components(net, path='', format=''):
                            'pipes': net.pipe,
                            'heat_exchangers': net.heat_exchanger,
                            'sinks': net.sink,
-                           'dh_network_simulator': net.source,
+                           'sources': net.source,
                            'valves': net.valve,
                            'controllers': net.controller
         }
@@ -144,7 +144,7 @@ def _import_sources_to(net, path):
     f = open(path+'sources.json')
     sources = json.load(f)
 
-    # add dh_network_simulator to pandapipes network
+    # add sources to pandapipes network
     for s in sources:
         pp.create_source(net,
                        junction=s.get('junction'),
