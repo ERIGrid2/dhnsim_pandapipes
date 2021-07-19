@@ -4,3 +4,6 @@ __pycache__/
 
 # Remove .idea
 .idea/
+
+# Remove .pytest_cache
+.pytest_cache/

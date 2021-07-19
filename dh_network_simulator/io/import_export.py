@@ -141,7 +141,7 @@ def _import_sinks_to(net, path):
 
 def _import_sources_to(net, path):
     # Load JSON from file
-    f = open(path+'dh_network_simulator.json')
+    f = open(path+'sources.json')
     sources = json.load(f)
 
     # add dh_network_simulator to pandapipes network
