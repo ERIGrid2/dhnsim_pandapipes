@@ -1,0 +1,9 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+
+# Remove .idea
+.idea/
+
+# Remove .pytest_cache
+.pytest_cache/
