@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='dh_network_simulator',
-    version='0.1.3',
+    version='0.1.0',
     url='https://github.com/cwowi/dh_network_simulator',
     license='BSD 3-Clause License',
     author='Christopher W. Wild',

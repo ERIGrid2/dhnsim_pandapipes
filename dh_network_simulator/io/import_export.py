@@ -6,11 +6,11 @@ import pandapipes.plotting as plot
 
 def export_network_components(net, path='', format=''):
     # Default pandapipes json output
-    if format is 'json_default':
+    if format == 'json_default':
         pp.to_json(net, path + 'network.json')
 
     # Readable component-wise json export
-    elif format is 'json_readable':
+    elif format == 'json_readable':
         # Create components list from network
         components_dict = {'junctions': net.junction,
                            'pipes': net.pipe,
@@ -40,12 +40,12 @@ def export_network_components(net, path='', format=''):
 
 def import_network_components(net, format='json_default', path=''):
     # Default pandapipes json import
-    if format is 'json_default':
+    if format == 'json_default':
         # Default pandapipes json output
         net = pp.from_json(path + 'network.json')
 
     # Component-wise import from Readable json files
-    elif format is 'json_readable':
+    elif format == 'json_readable':
         # import components
         _import_junctions_to(net, path)
         _import_pipes_to(net, path)

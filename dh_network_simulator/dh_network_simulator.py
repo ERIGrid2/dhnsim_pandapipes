@@ -1,9 +1,11 @@
 from dataclasses import dataclass, field
 import pandapipes as pp
+from collections import deque
 import pandapipes.plotting as plot
 from pandapipes.pandapipes_net import pandapipesNet
 from .dh_network_simulator_core import *
 from pandapower.timeseries.data_sources.frame_data import DFData
+from typing import Dict
 # Do not print python UserWarnings
 import sys
 
@@ -20,49 +22,80 @@ class DHNetworkSimulator():
     logging: str = 'default'  # Logging modes: 'default', 'all'
     net: pandapipesNet = field(init=False)
 
-    def __init__(self):
+    # Internal variables
+    collector_connections: dict = field(init=False)
+    historical_data: dict = field(init=False)  # Dict of FIFO shift registers for each datapoint
+
+    def __repr__(self):
+        rep = str(f'DHNetworkSimulator(logging={self.logging})')
+        return rep
+
+    def __post_init__(self):
         self._set_logging()
+        self._init_dh_network()
+        self._init_collector_connections()
+        self._init_historical_data_storage()
 
     def _set_logging(self):
-        if self.logging is 'default':
+        if self.logging == 'default':
             warnings.filterwarnings("ignore", message="Pipeflow converged, however, the results are phyisically incorrect as pressure is negative at nodes*")
-        elif self.logging is 'all':
+        elif self.logging == 'all':
             pass
         else:
             warnings.warn(f"Logging mode '{self.logging}' does not exist. Logging mode set to 'all'.")
 
-    def load_network(self, from_file=False, path='', format='json_default'):
-
+    def _init_dh_network(self):
         # create empty network
         self.net = pp.create_empty_network("net", add_stdtypes=False)
-
         # create fluid
         pp.create_fluid_from_lib(self.net, "water", overwrite=True)
 
-        if from_file is True:
-            # import network components
-            import_network_components(self.net, format=format, path=path)
+    def _init_collector_connections(self):
+        # Define stored attributes of the simulation
+        self.collector_connections = {
+            'junction': ['t_k']
+        }
 
-        else:
-            self._create_junctions()
-            self._create_pipes()
-            self._create_external_grid()
-            self._create_substations()
-            self._create_bypass()
-            self._create_heatpump()
-            self._create_controllers()
+    def _init_historical_data_storage(self):
+        dict = {}
+        for key, param_list in self.collector_connections.items():
+            component = getattr(self.net, key)
+            dict.update({key: {}})
+            for i in component.name:
+                dict[key].update({i: {}})
+                for param in param_list:
+                    dict[key][i].update({param:[]})
+
+        self.historical_data = dict
+
+
+    def load_network(self, from_file=False, path='', format='json_default'):
+        # import from file
+        if from_file is True:
+            import_network_components(net=self.net,
+                                      format=format,
+                                      path=path)
+
+        # initialize historical data storage
+        self._init_historical_data_storage()
 
     def save_network(self, path='', format='json_default'):
-        export_network_components(self.net, format=format, path=path)
+        export_network_components(net=self.net,
+                                  format=format,
+                                  path=path)
 
     def run_simulation(self, t, sim_mode='static'):
         # Run hydraulic flow (steady-state)
-        run_hydraulic_control(self.net, t)
+        run_hydraulic_control(net=self.net)
 
-        if sim_mode is 'static':
+        if sim_mode == 'static':
             run_static_pipeflow(self.net)
-        elif sim_mode is 'dynamic':
-            run_dynamic_pipeflow(self.net, t)
+        elif sim_mode == 'dynamic':
+            # Run dynamic pipeflow
+            run_dynamic_pipeflow(net=self.net,
+                                 historical_data=self.historical_data,
+                                 collector_connections=self.collector_connections,
+                                 t=t)
         else:
             warnings.warn(f"Simulation mode '{sim_mode}' does not exist. Simulation has stopped.")
 
@@ -70,22 +103,22 @@ class DHNetworkSimulator():
         error = False
 
         # Get corresponding network component
-        if type is 'sink':
+        if type == 'sink':
             component = self.net.sink
             result = self.net.res_sink
-        elif type is 'source':
+        elif type == 'source':
             component = self.net.source
             result = self.net.res_source
-        elif type is 'junction':
+        elif type == 'junction':
             component = self.net.junction
             result = self.net.res_junction
-        elif type is 'valve':
+        elif type == 'valve':
             component = self.net.valve
             result = self.net.res_valve
-        elif type is 'ext_grid':
+        elif type == 'ext_grid':
             component = self.net.ext_grid
             result = self.net.res_ext_grid
-        elif type is 'heat_exchanger':
+        elif type == 'heat_exchanger':
             component = self.net.heat_exchanger
             result = self.net.res_heat_exchanger
         else:
@@ -100,19 +133,19 @@ class DHNetworkSimulator():
         error = False
 
         # Get corresponding network component
-        if type is 'sink':
+        if type == 'sink':
             component = self.net.sink
-        elif type is 'source':
+        elif type == 'source':
             component = self.net.source
-        elif type is 'junction':
+        elif type == 'junction':
             component = self.net.junction
-        elif type is 'valve':
+        elif type == 'valve':
             component = self.net.valve
-        elif type is 'ext_grid':
+        elif type == 'ext_grid':
             component = self.net.ext_grid
-        elif type is 'heat_exchanger':
+        elif type == 'heat_exchanger':
             component = self.net.heat_exchanger
-        elif type is 'controller':
+        elif type == 'controller':
             component = self.net.controller
         else:
             warnings.warn(f"Component {name} cannot be found. Update not successful.")
@@ -121,22 +154,25 @@ class DHNetworkSimulator():
         if not error:
             set_value_of(component, name, type, parameter, value)
 
-    def _add_to_component_list(self, df):
-        if not self.componentList:
-            self.componentList = [df]
-        else:
-            self.componentList.append(df)
-
-    def _plot(self):
+    def plot_network_topology(self):
         # plot network
         plot.simple_plot(self.net, plot_sinks=True, plot_sources=True, sink_size=4.0, source_size=4.0)
 
     def load_data(self):
+        # TODO: Create API for datafiles in .csv format
         file = ''
         profiles_source = pd.read_csv(file, index_col=0)
         data_source = DFData(profiles_source)
         return data_source
 
+    '''
+    
+    def _add_to_component_list(self, df):
+         if not self.componentList:
+             self.componentList = [df]
+         else:
+             self.componentList.append(df)
+    
     def _create_junctions(self):
         # create nodes (with initial pressure and temperature)
         pn_init = 6
@@ -297,4 +333,4 @@ class DHNetworkSimulator():
 
         # create bypass valve
         pp.create_valve(net, j.index('n8s'), j.index('n8r'), diameter_m=0.1, opened=True, loss_coefficient=1000, name="bypass")
-
+    '''

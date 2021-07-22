@@ -13,7 +13,7 @@
         "std_type": null,
         "text_k": 281.15,
         "to_junction": 2,
-        "type": "supplypipe"
+        "type": "pipe"
     },
     {
         "alpha_w_per_m2k": 1.5,
@@ -29,7 +29,7 @@
         "std_type": null,
         "text_k": 281.15,
         "to_junction": 4,
-        "type": "supplypipe"
+        "type": "pipe"
     },
     {
         "alpha_w_per_m2k": 1.5,
@@ -45,7 +45,7 @@
         "std_type": null,
         "text_k": 281.15,
         "to_junction": 9,
-        "type": "supplypipe"
+        "type": "pipe"
     },
     {
         "alpha_w_per_m2k": 1.5,
@@ -61,7 +61,7 @@
         "std_type": null,
         "text_k": 281.15,
         "to_junction": 11,
-        "type": "supplypipe"
+        "type": "pipe"
     },
     {
         "alpha_w_per_m2k": 1.5,
@@ -77,7 +77,7 @@
         "std_type": null,
         "text_k": 281.15,
         "to_junction": 14,
-        "type": "supplypipe"
+        "type": "pipe"
     },
     {
         "alpha_w_per_m2k": 1.5,
@@ -93,7 +93,7 @@
         "std_type": null,
         "text_k": 281.15,
         "to_junction": 16,
-        "type": "supplypipe"
+        "type": "pipe"
     },
     {
         "alpha_w_per_m2k": 1.5,
@@ -109,7 +109,7 @@
         "std_type": null,
         "text_k": 281.15,
         "to_junction": 19,
-        "type": "supplypipe"
+        "type": "pipe"
     },
     {
         "alpha_w_per_m2k": 1.5,
@@ -125,7 +125,7 @@
         "std_type": null,
         "text_k": 281.15,
         "to_junction": 1,
-        "type": "returnpipe"
+        "type": "pipe"
     },
     {
         "alpha_w_per_m2k": 1.5,
@@ -141,7 +141,7 @@
         "std_type": null,
         "text_k": 281.15,
         "to_junction": 8,
-        "type": "returnpipe"
+        "type": "pipe"
     },
     {
         "alpha_w_per_m2k": 1.5,
@@ -157,7 +157,7 @@
         "std_type": null,
         "text_k": 281.15,
         "to_junction": 7,
-        "type": "returnpipe"
+        "type": "pipe"
     },
     {
         "alpha_w_per_m2k": 1.5,
@@ -173,7 +173,7 @@
         "std_type": null,
         "text_k": 281.15,
         "to_junction": 10,
-        "type": "returnpipe"
+        "type": "pipe"
     },
     {
         "alpha_w_per_m2k": 1.5,
@@ -189,7 +189,7 @@
         "std_type": null,
         "text_k": 281.15,
         "to_junction": 10,
-        "type": "returnpipe"
+        "type": "pipe"
     },
     {
         "alpha_w_per_m2k": 1.5,
@@ -205,7 +205,7 @@
         "std_type": null,
         "text_k": 281.15,
         "to_junction": 15,
-        "type": "returnpipe"
+        "type": "pipe"
     },
     {
         "alpha_w_per_m2k": 1.5,
@@ -221,6 +221,6 @@
         "std_type": null,
         "text_k": 281.15,
         "to_junction": 15,
-        "type": "returnpipe"
+        "type": "pipe"
     }
 ]
