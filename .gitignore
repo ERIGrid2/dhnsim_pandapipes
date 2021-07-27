@@ -4,6 +4,10 @@ __pycache__/
 
 # Remove .idea
 .idea/
+# Remove build attributes#
+.dist/
+.build/
+.dh_network_simulator.egg-info/
 
 # Remove .pytest_cache
 .pytest_cache/
