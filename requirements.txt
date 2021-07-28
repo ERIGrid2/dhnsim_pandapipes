@@ -1,0 +1,8 @@
+numpy
+numpydoc
+pandas
+dataclasses
+pandapipes>=0.3.0
+simple_pid
+matplotlib
+pytest
