@@ -41,5 +41,5 @@ jobs:
         # pip install pytest
         pip install pytest-cov
         # pytest --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
-        pytest --cov-report term --cov=myproj tests/
+        pytest --cov-report term --cov=myproj test/
 
