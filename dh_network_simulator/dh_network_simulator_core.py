@@ -151,35 +151,45 @@ def _dynamic_temp_flow_calc_of(net, pipe, historical_data, inlet_junction, t):
     # Set pipe outlet temperature
     net.res_pipe.at[p.index(pipe), 't_to_k'] = Tout
 
-def _update_temperatures_of_connected_junctions_to(net, pipe):
+def _get_connected_junctions_id(net, pipe):
     p = net.pipe['name'].to_list()
     v = net.valve['name'].to_list()
 
     # Get connected junctions (direct and indirect)
     # Check direct connection via junction
-    conn_j_id = []
-    conn_j_id.append(net.pipe.at[p.index(pipe), 'to_junction'])
+    j_ids = []
+    j_ids.append(net.pipe.at[p.index(pipe), 'to_junction'])
+
     # Check connection via valve
-    conn_v_name = net.valve['name'].loc[net.valve['from_junction'].isin(conn_j_id)].values.tolist()
-    for valve in conn_v_name:
+    valve_names = net.valve['name'].loc[net.valve['from_junction'].isin(j_ids)].values.tolist()
+    for valve in valve_names:
         opened = net.valve.at[v.index(valve), 'opened']
         if opened:
-            conn_j_id.append(net.valve.at[v.index(valve), 'to_junction'])
+            j_ids.append(net.valve.at[v.index(valve), 'to_junction'])
+
+    # Get connected junction names
+    j_names = net.junction['name'].iloc[j_ids].values.tolist()
+
+    return j_ids, j_names
+
+
+def _update_temperatures_of_connected_junctions_to(net, pipe):
+    # Get connected junctions to the pipe end
+    j_ids, j_names = _get_connected_junctions_id(net=net,
+                                                 pipe=pipe)
 
     # Set temperature at connected junctions
-    conn_j_name = net.junction['name'].iloc[conn_j_id].values.tolist()
-    for junction in conn_j_name:
+    for junction in j_names:
         _set_pipe_inlet_temperature_at_junction(net=net,
                                                 junction=junction)
 
 def _update_temperatures_of_connected_hex_to(net, pipe):
-    p = net.pipe['name'].to_list()
-    # Check direct connection via junction
-    conn_j_id = []
-    conn_j_id.append(net.pipe.at[p.index(pipe), 'to_junction'])
+    # Get connected junctions to the pipe end
+    j_ids, j_names = _get_connected_junctions_id(net=net,
+                                                 pipe=pipe)
 
-    # Get connected hex consumer
-    hex_name = net.heat_exchanger['name'].loc[net.heat_exchanger['from_junction'].isin(conn_j_id)].values.tolist()
+    # Set hex consumer return temperature
+    hex_name = net.heat_exchanger['name'].loc[net.heat_exchanger['from_junction'].isin(j_ids)].values.tolist()
     for hex in hex_name:
         # Set temperature at the return side of each hex consumer
         _calc_consumer_return_temperature(net=net,

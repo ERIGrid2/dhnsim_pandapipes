@@ -4,6 +4,7 @@ from pandas._testing import assert_frame_equal
 from dh_network_simulator.io import import_network_components
 from dh_network_simulator.io import export_network_components
 from dh_network_simulator.component_models.valve_control import CtrlValve
+from dh_network_simulator.test import test_dir
 
 
 def test_import_default():
@@ -13,7 +14,7 @@ def test_import_default():
     # import network from json file
     net = pp.create_empty_network("net", add_stdtypes=False)
     pp.create_fluid_from_lib(net, "water", overwrite=True)
-    net = import_network_components(net, path='../resources/import/', format='json_default')
+    net = import_network_components(net, path=test_dir+'/resources/import/', format='json_default')
 
     # assert
     assert_frame_equal(net.controller.loc[:, net.controller.columns != 'object'],
@@ -30,7 +31,7 @@ def test_import_json_readable():
     # import network from json file
     net = pp.create_empty_network("net", add_stdtypes=False)
     pp.create_fluid_from_lib(net, "water", overwrite=True)
-    net = import_network_components(net, path='../resources/import/', format='json_readable')
+    net = import_network_components(net, path=test_dir+'/resources/import/', format='json_readable')
 
     # assert
     assert_frame_equal(net.controller.loc[:, net.controller.columns != 'object'],
@@ -99,48 +100,48 @@ def _create_pipes(net):
     # supply pipes
     pp.create_pipe_from_parameters(net, from_junction=j.index('n1s'), to_junction=j.index('n2s'), length_km=0.5,
                                    diameter_m=0.1, k_mm=0.01, sections=5, alpha_w_per_m2k=1.5,
-                                   text_k=273.15 + 8, name="l1s", type='supplypipe')
+                                   text_k=273.15 + 8, name="l1s", type='pipe')
     pp.create_pipe_from_parameters(net, from_junction=j.index('n3sv'), to_junction=j.index('n3s'), length_km=0.01,
                                    diameter_m=0.1, k_mm=0.01, sections=1, alpha_w_per_m2k=1.5,
-                                   text_k=273.15 + 8, name="l1s_tank", type='supplypipe')  # create tank pipe connection
+                                   text_k=273.15 + 8, name="l1s_tank", type='pipe')  # create tank pipe connection
     pp.create_pipe_from_parameters(net, from_junction=j.index('n3s'), to_junction=j.index('n4s'), length_km=0.5,
                                    diameter_m=0.1, k_mm=0.01, sections=5, alpha_w_per_m2k=1.5,
-                                   text_k=273.15 + 8, name="l2s", type='supplypipe')
+                                   text_k=273.15 + 8, name="l2s", type='pipe')
     pp.create_pipe_from_parameters(net, from_junction=j.index('n4s'), to_junction=j.index('n5sv'), length_km=0.01,
                                    diameter_m=0.1, k_mm=0.01, sections=1, alpha_w_per_m2k=1.5,
-                                   text_k=273.15 + 8, name="l3s", type='supplypipe')
+                                   text_k=273.15 + 8, name="l3s", type='pipe')
     pp.create_pipe_from_parameters(net, from_junction=j.index('n4s'), to_junction=j.index('n6s'), length_km=0.5,
                                    diameter_m=0.1, k_mm=0.01, sections=5, alpha_w_per_m2k=1.5,
-                                   text_k=273.15 + 8, name="l4s", type='supplypipe')
+                                   text_k=273.15 + 8, name="l4s", type='pipe')
     pp.create_pipe_from_parameters(net, from_junction=j.index('n6s'), to_junction=j.index('n7sv'), length_km=0.01,
                                    diameter_m=0.1, k_mm=0.01, sections=1, alpha_w_per_m2k=1.5,
-                                   text_k=273.15 + 8, name="l5s", type='supplypipe')
+                                   text_k=273.15 + 8, name="l5s", type='pipe')
     pp.create_pipe_from_parameters(net, from_junction=j.index('n6s'), to_junction=j.index('n8s'), length_km=0.01,
                                    diameter_m=0.1, k_mm=0.01, sections=1, alpha_w_per_m2k=1.5,
-                                   text_k=273.15 + 8, name="l6s", type='supplypipe')
+                                   text_k=273.15 + 8, name="l6s", type='pipe')
 
     # return pipes
     pp.create_pipe_from_parameters(net, from_junction=j.index('n2r'), to_junction=j.index('n1r'), length_km=0.5,
                                    diameter_m=0.1, k_mm=0.01, sections=5, alpha_w_per_m2k=1.5,
-                                   text_k=273.15 + 8, name="l1r", type='returnpipe')
+                                   text_k=273.15 + 8, name="l1r", type='pipe')
     pp.create_pipe_from_parameters(net, from_junction=j.index('n3r'), to_junction=j.index('n3r_tank'), length_km=0.01,
                                    diameter_m=0.1, k_mm=0.01, sections=1, alpha_w_per_m2k=1.5,
-                                   text_k=273.15 + 8, name="l1r_tank", type='returnpipe')  # create tank pipe connection
+                                   text_k=273.15 + 8, name="l1r_tank", type='pipe')  # create tank pipe connection
     pp.create_pipe_from_parameters(net, from_junction=j.index('n4r'), to_junction=j.index('n3r'), length_km=0.5,
                                    diameter_m=0.1, k_mm=0.01, sections=5, alpha_w_per_m2k=1.5,
-                                   text_k=273.15 + 8, name="l2r", type='returnpipe')
+                                   text_k=273.15 + 8, name="l2r", type='pipe')
     pp.create_pipe_from_parameters(net, from_junction=j.index('n5r'), to_junction=j.index('n4r'), length_km=0.01,
                                    diameter_m=0.1, k_mm=0.01, sections=1, alpha_w_per_m2k=1.5,
-                                   text_k=273.15 + 8, name="l3r", type='returnpipe')
+                                   text_k=273.15 + 8, name="l3r", type='pipe')
     pp.create_pipe_from_parameters(net, from_junction=j.index('n6r'), to_junction=j.index('n4r'), length_km=0.5,
                                    diameter_m=0.1, k_mm=0.01, sections=5, alpha_w_per_m2k=1.5,
-                                   text_k=273.15 + 8, name="l4r", type='returnpipe')
+                                   text_k=273.15 + 8, name="l4r", type='pipe')
     pp.create_pipe_from_parameters(net, from_junction=j.index('n7r'), to_junction=j.index('n6r'), length_km=0.01,
                                    diameter_m=0.1, k_mm=0.01, sections=1, alpha_w_per_m2k=1.5,
-                                   text_k=273.15 + 8, name="l5r", type='returnpipe')
+                                   text_k=273.15 + 8, name="l5r", type='pipe')
     pp.create_pipe_from_parameters(net, from_junction=j.index('n8r'), to_junction=j.index('n6r'), length_km=0.01,
                                    diameter_m=0.1, k_mm=0.01, sections=1, alpha_w_per_m2k=1.5,
-                                   text_k=273.15 + 8, name="l6r", type='returnpipe')
+                                   text_k=273.15 + 8, name="l6r", type='pipe')
 
     # create grid connector valves
     pp.create_valve(net, j.index('n2s'), j.index('n3s'), diameter_m=0.1, loss_coefficient=1000, opened=True, name="grid_v1")
