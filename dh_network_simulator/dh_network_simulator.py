@@ -121,6 +121,9 @@ class DHNetworkSimulator():
         elif type == 'heat_exchanger':
             component = self.net.heat_exchanger
             result = self.net.res_heat_exchanger
+        elif type == 'controller':
+            component = self.net.controller
+            result = self.net.controller
         else:
             warnings.warn(f"Component {name} cannot be found. Update not successful.")
             error = True
