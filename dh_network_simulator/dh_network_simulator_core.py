@@ -99,16 +99,16 @@ def _calc_consumer_return_temperature(net, hex):
         net.res_pipe.at[p.index(pipe), 't_from_k'] = return_temp
 
 def _get_pipe_stream_of(net, type='pipe'):
-    # Get subset of pipes based on 'type'
-    pipe_index = net.pipe['name'].loc[net.pipe['type'] == type].index.tolist()
+    # Get subset of pipes based on 'type' (deprecated!)
+    # pipe_index = net.pipe['name'].loc[net.pipe['type'] == type].index.tolist()
 
     # Sort pipes by pressure drop along the network
     pipe_stream = _get_pipe_flow_by_pressures(net=net,
-                                              pipe_index=pipe_index)
+                                              pipe_index=net.pipe['name'].index.tolist())
 
-    if not pipe_stream:
-        # Throw UserWarning
-        warnings.warn(f'EmptyPipeStream: No network components of type "{type}" detected.', UserWarning)
+    if not pipe_stream.size:
+        # Throw RuntimeError
+        raise RuntimeError(f'EmptyPipeStream: No network components of type "{type}" detected.')
 
     return (pipe_stream)
 
