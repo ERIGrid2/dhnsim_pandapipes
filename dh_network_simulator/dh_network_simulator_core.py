@@ -106,6 +106,10 @@ def _get_pipe_stream_of(net, type='pipe'):
     pipe_stream = _get_pipe_flow_by_pressures(net=net,
                                               pipe_index=pipe_index)
 
+    if not pipe_stream:
+        # Throw UserWarning
+        warnings.warn(f'EmptyPipeStream: No network components of type "{type}" detected.', UserWarning)
+
     return (pipe_stream)
 
 def _get_pipe_flow_by_pressures(net, pipe_index):
