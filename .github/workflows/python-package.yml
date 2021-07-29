@@ -42,5 +42,5 @@ jobs:
         pip install pytest-xdist
         pip install pytest-cov
         # pytest --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
-        pytest --cov=dh_network_simulator dh_network_simulator/test --cov-report xml:cov.xml
+        pytest --cov=dh_network_simulator dh_network_simulator/test --cov-report term --cov-report xml:cov.xml
 
