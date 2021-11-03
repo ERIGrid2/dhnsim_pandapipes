@@ -3,7 +3,7 @@
         "in_service": true,
         "junction": 0,
         "name": "ext_grid",
-        "p_bar": 6.0,
+        "p_bar": 20.0,
         "t_k": 348.15,
         "type": "pt"
     },
@@ -11,7 +11,7 @@
         "in_service": true,
         "junction": 5,
         "name": "supply_tank",
-        "p_bar": 6.0,
+        "p_bar": 20.0,
         "t_k": 343.15,
         "type": "pt"
     }
