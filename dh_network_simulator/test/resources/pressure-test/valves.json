@@ -1,0 +1,38 @@
+[
+    {
+        "diameter_m": 0.1,
+        "from_junction": 2,
+        "loss_coefficient": 0,
+        "name": "grid_v1",
+        "opened": true,
+        "to_junction": 4,
+        "type": "valve"
+    },
+    {
+        "diameter_m": 0.1,
+        "from_junction": 11,
+        "loss_coefficient": 0,
+        "name": "sub_v1",
+        "opened": true,
+        "to_junction": 12,
+        "type": "valve"
+    },
+    {
+        "diameter_m": 0.1,
+        "from_junction": 16,
+        "loss_coefficient": 0,
+        "name": "sub_v2",
+        "opened": true,
+        "to_junction": 17,
+        "type": "valve"
+    },
+    {
+        "diameter_m": 0.1,
+        "from_junction": 5,
+        "loss_coefficient": 0,
+        "name": "tank_v1",
+        "opened": true,
+        "to_junction": 6,
+        "type": "valve"
+    }
+]
