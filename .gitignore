@@ -12,3 +12,7 @@ dh_network_simulator.egg-info/
 
 # Remove .pytest_cache
 .pytest_cache/
+
+# Ignore test logging
+dh_network_simulator/test/pipeflow/dhn_sim_logging.log
+dh_network_simulator/test/pressure-test/dhn_sim_logging.log
