@@ -13,6 +13,9 @@ if not sys.warnoptions:
     import warnings
 
 def run_hydraulic_control(net, **kwargs):
+    """
+        Run hydraulic control step (mass flows and pressures) of the dhs by considering the controller setpoints and hierarchy.
+    """
     # Ignore user warnings of control
     try:
         run_control(net, max_iter=100, **kwargs)
@@ -22,9 +25,15 @@ def run_hydraulic_control(net, **kwargs):
         warnings.warn(f'ControllerNotConverged: Maximum number of iterations per controller is reached.', UserWarning)
 
 def run_static_pipeflow(net):
+    """
+        Run the static temperature flow simulation step of the dhs.
+    """
     pp.pipeflow(net, transient=False, mode="all", max_iter=100, run_control=True, heat_transfer=True)
 
 def run_dynamic_pipeflow(net, t, historical_data, collector_connections):
+    """
+        Run the dynamic temperature flow simulation step of the dhs.
+    """
     # Dynamic heat flow distribution
     _dynamic_temp_flow_sim(net=net,
                            historical_data=historical_data,
@@ -37,6 +46,9 @@ def run_dynamic_pipeflow(net, t, historical_data, collector_connections):
                     cur_t=t)
 
 def _dynamic_temp_flow_sim(net, historical_data, t):
+    """
+        Dynamic temperature flow simulation step considering the thermal inertia in the network.
+    """
     # Get pipe stream according to the temperature flow in the network
     pipe_stream = _get_pipe_stream_of(net=net)
 
@@ -47,6 +59,9 @@ def _dynamic_temp_flow_sim(net, historical_data, t):
                               t=t)
 
 def _dynamic_temp_flow_sim_of(net, pipe_stream, historical_data, t):
+    """
+        Successive temperature flow calculation for a given pipe stream (from heat injection towards the consumers).
+    """
     for pipe in pipe_stream:
         inlet_junction = _get_inlet_junction_of_pipe(net=net,
                                                      pipe=pipe)
@@ -64,6 +79,9 @@ def _dynamic_temp_flow_sim_of(net, pipe_stream, historical_data, t):
                                                  pipe=pipe)
 
 def _get_inlet_junction_of_pipe(net, pipe):
+    """
+        Get network junction connected to the inlet of the pipe.
+    """
     # Get list of pipes and junction of the network
     p = net.pipe['name'].to_list()
     j = net.junction['name'].to_list()
@@ -74,6 +92,9 @@ def _get_inlet_junction_of_pipe(net, pipe):
     return j[index]
 
 def _calc_consumer_return_temperature(net, hex):
+    """
+        Get network junction connected to the inlet of the pipe.
+    """
     h = net.heat_exchanger['name'].to_list()
     p = net.pipe['name'].to_list()
 
@@ -99,6 +120,9 @@ def _calc_consumer_return_temperature(net, hex):
         net.res_pipe.at[p.index(pipe), 't_from_k'] = return_temp
 
 def _get_pipe_stream_of(net, type='pipe'):
+    """
+        Get the pipe stream in the network from heat injection towards the consumers.
+    """
     # Get subset of pipes based on 'type' (deprecated!)
     # pipe_index = net.pipe['name'].loc[net.pipe['type'] == type].index.tolist()
 
@@ -113,6 +137,9 @@ def _get_pipe_stream_of(net, type='pipe'):
     return (pipe_stream)
 
 def _get_pipe_flow_by_pressures(net, pipe_index):
+    """
+        Get the pipe flow direction in the network from heat injection towards the consumers by analyzing the calculated pressure drops in the system.
+    """
     # Get pipe results by index and sort pipes according to their pressures
     index = net.res_pipe.iloc[pipe_index, :].sort_values('p_from_bar', ascending=False).index
 
@@ -122,6 +149,9 @@ def _get_pipe_flow_by_pressures(net, pipe_index):
     return pipenames
 
 def _dynamic_temp_flow_calc_of(net, pipe, historical_data, inlet_junction, t):
+    """
+        Dynamic temperature flow calculation for a given pipe based on the mass flow, pipe length and ambient temperature.
+    """
     # Set list of network junctions and pipes
     p = net.pipe['name'].to_list()
     j = net.junction['name'].to_list()
@@ -156,6 +186,9 @@ def _dynamic_temp_flow_calc_of(net, pipe, historical_data, inlet_junction, t):
     net.res_pipe.at[p.index(pipe), 't_to_k'] = Tout
 
 def _get_connected_junctions_id(net, pipe):
+    """
+        Dynamic temperature flow calculation for a given pipe based on the mass flow, pipe length and ambient temperature.
+    """
     p = net.pipe['name'].to_list()
     v = net.valve['name'].to_list()
 
@@ -178,16 +211,22 @@ def _get_connected_junctions_id(net, pipe):
 
 
 def _update_temperatures_of_connected_junctions_to(net, pipe):
+    """
+        Overwrite the temperatures of the junction(s) connected to the end of a pipe.
+    """
     # Get connected junctions to the pipe end
     j_ids, j_names = _get_connected_junctions_id(net=net,
                                                  pipe=pipe)
 
     # Set temperature at connected junctions
     for junction in j_names:
-        _set_pipe_inlet_temperature_at_junction(net=net,
+        _update_pipe_inlet_temperature_at_junction(net=net,
                                                 junction=junction)
 
 def _update_temperatures_of_connected_hex_to(net, pipe):
+    """
+        Overwrite the temperatures of the connected heat exchangers connected to the end of a pipe.
+    """
     # Get connected junctions to the pipe end
     j_ids, j_names = _get_connected_junctions_id(net=net,
                                                  pipe=pipe)
@@ -199,7 +238,11 @@ def _update_temperatures_of_connected_hex_to(net, pipe):
         _calc_consumer_return_temperature(net=net,
                                           hex=hex)
 
-def _set_pipe_inlet_temperature_at_junction(net, junction):
+def _update_pipe_inlet_temperature_at_junction(net, junction):
+    """
+        Overwrites the inlet temperature of all pipes connected to a junction.
+        If a valve is connected to the junction, it also overwrites the inlet temperature of pipes connected to the outlet of the valve.
+    """
     j = net.junction['name'].to_list()
     p = net.pipe['name'].to_list()
     v = net.valve['name'].to_list()
@@ -230,6 +273,9 @@ def _set_pipe_inlet_temperature_at_junction(net, junction):
     net.res_junction.at[j.index(junction), 't_k'] = Tset
 
 def set_value_of(component, name, type, parameter, value):
+    """
+        Public setter for the pandapipes network component parameters and attributes.
+    """
     # Call controller object and set attribute by name (str)
     if type == 'controller':
         index = [c.name for c in component['object']].index(name)
@@ -242,6 +288,9 @@ def set_value_of(component, name, type, parameter, value):
         component.at[index, parameter] = value
 
 def get_value_of(component, name, type, parameter, result):
+    """
+        Public getter for the pandapipes network component parameters and attributes.
+    """
     if type == 'controller':
         index = [c.name for c in component['object']].index(name)
         c = component['object'].iloc[index]
@@ -255,6 +304,9 @@ def get_value_of(component, name, type, parameter, result):
     return value
 
 def enqueue_results(net, cur_t, queue, collector_connections):
+    """
+        Enqueue simulation results of defined connections to a data storage queue.
+    """
     for key, param_list in collector_connections.items():
         component = getattr(net, key)
         result = getattr(net, 'res_'+key)
@@ -268,7 +320,9 @@ def enqueue_results(net, cur_t, queue, collector_connections):
     return queue
 
 def dequeue_results(t, queue, collector_connections, auto_sizing_enabled='False'):
-
+    """
+        Dequeue simulation results of defined connections from a data storage queue.
+    """
     if isinstance(queue, list):
         if auto_sizing_enabled == 'True':
             val = queue.pop()

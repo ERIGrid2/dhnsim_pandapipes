@@ -13,6 +13,7 @@ import random
 class CtrlValve(control.basic_controller.Controller):
     """
         Example class of a Valve-Controller. Models an abstract control valve.
+        The control step is determined by the euler method.
     """
 
     def __init__(self, net, valve_id, data_source=None, profile_name=None, in_service=True, enable_plotting=False,

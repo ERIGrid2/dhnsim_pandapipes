@@ -5,6 +5,9 @@ import pandapower.control as control
 import pandapipes.plotting as plot
 
 def export_network_components(net, path='', format=''):
+    """
+        Exports the network configurations via pandapipes default export function (json_default) or by the network component files (json_readable).
+    """
     # Default pandapipes json output
     if format == 'json_default':
         pp.to_json(net, path + 'network.json')
@@ -39,6 +42,9 @@ def export_network_components(net, path='', format=''):
 
 
 def import_network_components(net, format='json_default', path=''):
+    """
+        Imports the network configurations via pandapipes default import function (json_default) or by the network component files (json_readable).
+    """
     # Default pandapipes json import
     if format == 'json_default':
         # Default pandapipes json output
@@ -55,12 +61,15 @@ def import_network_components(net, format='json_default', path=''):
         _import_external_grids_to(net, path)
         _import_heat_exchangers_to(net, path)
         _import_controllers_to(net, path)
-        # _import_pumps_to(net, path)  # TODO: Import inline pummps (check support of pandapipes)
+        # _import_pumps_to(net, path)  # TODO: Import inline pumps (check support of pandapipes)
 
     return net
 
 
 def _import_heat_exchangers_to(net, path):
+    """
+        Import all heat exchanger components from import file (json_readable).
+    """
     # Load JSON from file
     f = open(path+'heat_exchangers.json')
     heat_exchangers = json.load(f)
@@ -80,6 +89,9 @@ def _import_heat_exchangers_to(net, path):
     return heat_exchangers
 
 def _import_junctions_to(net, path):
+    """
+        Import all junction components from import file (json_readable).
+    """
     # Load JSON from file
     f = open(path+'junctions.json')
     junctions = json.load(f)
@@ -97,6 +109,9 @@ def _import_junctions_to(net, path):
     return junctions
 
 def _import_pipes_to(net, path):
+    """
+        Import all pipe components from import file (json_readable).
+    """
     # Load JSON from file
     f = open(path+'pipes.json')
     pipes = json.load(f)
@@ -123,6 +138,9 @@ def _import_pipes_to(net, path):
 
 
 def _import_sinks_to(net, path):
+    """
+        Import all sink components from import file (json_readable).
+    """
     # Load JSON from file
     f = open(path+'sinks.json')
     sinks = json.load(f)
@@ -140,6 +158,9 @@ def _import_sinks_to(net, path):
     return sinks
 
 def _import_sources_to(net, path):
+    """
+        Import all source components from import file (json_readable).
+    """
     # Load JSON from file
     f = open(path+'sources.json')
     sources = json.load(f)
@@ -157,6 +178,9 @@ def _import_sources_to(net, path):
     return sources
 
 def _import_valves_to(net, path):
+    """
+        Import all valve components from import file (json_readable).
+    """
     # Load JSON from file
     f = open(path+'valves.json')
     valves = json.load(f)
@@ -175,6 +199,9 @@ def _import_valves_to(net, path):
     return valves
 
 def _import_controllers_to(net, path):
+    """
+        Import all controller components from import file (json_readable).
+    """
     # Load JSON from file
     f = open(path + 'controllers.json')
     controllers = json.load(f)
@@ -213,6 +240,9 @@ def _import_controllers_to(net, path):
     return controllers
 
 def _import_external_grids_to(net, path):
+    """
+        Import all external grid components from import file (json_readable).
+    """
     # Load JSON from file
     f = open(path+'ext_grids.json')
     ext_grids = json.load(f)
@@ -230,6 +260,9 @@ def _import_external_grids_to(net, path):
     return ext_grids
 
 def _import_pumps_to(net, path):
+    """
+        Import all pump components from import file (json_readable).
+    """
     # TODO: Implement import function of pumps
     pumps = []
     return pumps
