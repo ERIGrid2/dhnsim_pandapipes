@@ -1,0 +1,8 @@
+INFO:__main__:Initialized logger.
+INFO:dh_network_simulator.dh_network_simulator:DH Network Simulator: Logging (level="INFO") enabled.
+INFO:pandapower.control.util.auxiliary:Creating controller 0 of type <class 'dh_network_simulator.component_models.valve_control.CtrlValve'> 
+INFO:pandapower.control.util.auxiliary:Creating controller 1 of type <class 'dh_network_simulator.component_models.valve_control.CtrlValve'> 
+INFO:pandapower.control.util.auxiliary:Creating controller 2 of type <class 'dh_network_simulator.component_models.valve_control.CtrlValve'> 
+INFO:pandapower.control.util.auxiliary:Creating controller 3 of type <class 'dh_network_simulator.component_models.valve_control.CtrlValve'> 
+INFO:pandapower.control.util.auxiliary:Creating controller 4 of type <class 'dh_network_simulator.component_models.valve_control.CtrlValve'> 
+WARNING:pandapower.control.run_control:initial_run as attribute is deprecated. initial_run is now part of the net.controller DataFrame

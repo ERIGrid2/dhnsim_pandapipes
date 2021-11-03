@@ -1,0 +1,32 @@
+[
+    {
+        "diameter_m": 0.1,
+        "from_junction": 12,
+        "in_service": true,
+        "loss_coefficient": 0.0,
+        "name": "hex1",
+        "qext_w": 500000.0,
+        "to_junction": 13,
+        "type": "heat_exchanger"
+    },
+    {
+        "diameter_m": 0.1,
+        "from_junction": 17,
+        "in_service": true,
+        "loss_coefficient": 0.0,
+        "name": "hex2",
+        "qext_w": 500000.0,
+        "to_junction": 18,
+        "type": "heat_exchanger"
+    },
+	    {
+        "diameter_m": 0.1,
+        "from_junction": 7,
+        "in_service": true,
+        "loss_coefficient": 0.0,
+        "name": "hp_evap",
+        "qext_w": 0,
+        "to_junction": 3,
+        "type": "heat_exchanger"
+    }
+]

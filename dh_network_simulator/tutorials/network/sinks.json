@@ -1,0 +1,18 @@
+[
+    {
+        "in_service": true,
+        "junction": 1,
+        "mdot_kg_per_s": 7.5,
+        "name": "sink_grid",
+        "scaling": 1.0,
+        "type": "sink"
+    },
+    {
+        "in_service": true,
+        "junction": 8,
+        "mdot_kg_per_s": 3.0,
+        "name": "sink_tank",
+        "scaling": 1.0,
+        "type": "sink"
+    }
+]
