@@ -8,6 +8,7 @@ from pandapower.timeseries.data_sources.frame_data import DFData
 from typing import Dict
 # Do not print python UserWarnings
 import sys
+import logging
 
 if not sys.warnoptions:
     import warnings
@@ -29,7 +30,7 @@ class DHNetworkSimulator():
 
     """
 
-    logging: str = 'default'  # Logging modes: 'default', 'all'
+    logging_enabled: bool = True  # Logging modes: 'default', 'all'
     net: pandapipesNet = field(init=False)
 
     # Internal variables
@@ -41,18 +42,19 @@ class DHNetworkSimulator():
         return rep
 
     def __post_init__(self):
-        self._set_logging()
+        self._init_logging()
         self._init_dh_network()
         self._init_collector_connections()
         self._init_historical_data_storage()
 
-    def _set_logging(self):
-        if self.logging == 'default':
-            warnings.filterwarnings("ignore", message="Pipeflow converged, however, the results are phyisically incorrect as pressure is negative at nodes*")
-        elif self.logging == 'all':
-            pass
-        else:
-            warnings.warn(f"Logging mode '{self.logging}' does not exist. Logging mode set to 'all'.")
+    def _init_logging(self):
+        if self.logging_enabled:
+            self.logger = logging.getLogger(__name__)
+            self.logger.setLevel(logging.INFO)
+            self.logger.info(f'DH Network Simulator: Logging (level="{logging.getLevelName(self.logger.level)}") enabled.')
+
+        # Ignore filter warning of hydraulic dynamics
+        warnings.filterwarnings("ignore", message="Pipeflow converged, however, the results are phyisically incorrect as pressure is negative at nodes*")
 
     def _init_dh_network(self):
         # create empty network
@@ -82,9 +84,13 @@ class DHNetworkSimulator():
     def load_network(self, from_file=False, path='', format='json_default'):
         # import from file
         if from_file is True:
-            import_network_components(net=self.net,
+            try:
+                import_network_components(net=self.net,
                                       format=format,
                                       path=path)
+            except ImportError as error:
+                # Throw error if import was not successful
+                self.logger.error(error)
 
         # initialize historical data storage
         self._init_historical_data_storage()
@@ -96,7 +102,12 @@ class DHNetworkSimulator():
 
     def run_simulation(self, t, sim_mode='static'):
         # Run hydraulic flow (steady-state)
-        run_hydraulic_control(net=self.net)
+        try:
+            run_hydraulic_control(net=self.net)
+        except:
+            # Throw UserWarning
+            # self.logger.error(f"Simulation mode '{sim_mode}' does not exist. Simulation has stopped.")
+            self.logger.warning(f'ControllerNotConverged: Maximum number of iterations per controller is reached.')
 
         if sim_mode == 'static':
             run_static_pipeflow(self.net)
@@ -107,7 +118,7 @@ class DHNetworkSimulator():
                                  collector_connections=self.collector_connections,
                                  t=t)
         else:
-            warnings.warn(f"Simulation mode '{sim_mode}' does not exist. Simulation has stopped.")
+            self.logger.error(f"Simulation mode '{sim_mode}' does not exist. Simulation has stopped.")
 
     def get_value_of_network_component(self, type, name, parameter):
         error = False
@@ -135,7 +146,7 @@ class DHNetworkSimulator():
             component = self.net.controller
             result = self.net.controller
         else:
-            warnings.warn(f"Component {name} cannot be found. Update not successful.")
+            self.logger.error(f"Component {name} cannot be found. Update not successful.")
             error = True
 
         if not error:
@@ -161,7 +172,7 @@ class DHNetworkSimulator():
         elif type == 'controller':
             component = self.net.controller
         else:
-            warnings.warn(f"Component {name} cannot be found. Update not successful.")
+            self.logger.error(f"Component {name} cannot be found. Update not successful.")
             error = True
 
         if not error:

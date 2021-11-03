@@ -16,13 +16,9 @@ def run_hydraulic_control(net, **kwargs):
     """
         Run hydraulic control step (mass flows and pressures) of the dhs by considering the controller setpoints and hierarchy.
     """
-    # Ignore user warnings of control
-    try:
-        run_control(net, max_iter=100, **kwargs)
+    # run pandapipes hydraulic control
+    run_control(net, max_iter=100, **kwargs)
 
-    except:
-        # Throw UserWarning
-        warnings.warn(f'ControllerNotConverged: Maximum number of iterations per controller is reached.', UserWarning)
 
 def run_static_pipeflow(net):
     """

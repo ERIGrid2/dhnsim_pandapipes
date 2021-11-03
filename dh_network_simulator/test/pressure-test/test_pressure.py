@@ -27,7 +27,7 @@ def test_pressure_drop_at_valves(plot_pressure_results_enabled=False,
     df_mass_flows = pd.DataFrame(columns=valves, index=sim_period)
 
     for t in sim_period:
-        # init controls
+        # init
         _init_network_controls(dhn_sim, inputs, t)
         # run simulation
         dhn_sim.run_simulation(t, sim_mode='static')
@@ -130,6 +130,5 @@ if __name__ == '__main__':
     logger = logging.getLogger(__name__)
     logger.info('Initialized logger.')
 
-    # run tests
     pytest.main(["test_pressure.py"])
     plt.show()
