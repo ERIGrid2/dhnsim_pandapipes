@@ -106,7 +106,6 @@ class DHNetworkSimulator():
             run_hydraulic_control(net=self.net)
         except:
             # Throw UserWarning
-            # self.logger.error(f"Simulation mode '{sim_mode}' does not exist. Simulation has stopped.")
             self.logger.warning(f'ControllerNotConverged: Maximum number of iterations per controller is reached.')
 
         if sim_mode == 'static':
