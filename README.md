@@ -8,7 +8,7 @@ or via setup.py file:
 ```
 python setup.py install
 ```
-# Tutorial
+# Tutorials
 In ./tutorials you can find a simple tutorial how to use the dh_network_simulator library for both, static and dynamic heat distribution simulation.
 ```
 python simple-simulation-tutorial.py
