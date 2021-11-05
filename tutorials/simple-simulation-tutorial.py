@@ -15,12 +15,12 @@ logger.info('Initialized logger.')
 dhn_sim = DHNetworkSimulator()
 
 # Load data either by an existing pandapipes network or via file import.
-dhn_sim.load_network(from_file=True, path='./network/', format='json_readable')
+dhn_sim.load_network(from_file=True, path='network/', format='json_readable')
 
 # Plot network topology
 dhn_sim.plot_network_topology()
 
-# Run static dhn simulation for a time step t
+# Run static dhn simulation for a time step t=0
 dhn_sim.run_simulation(t=0, sim_mode='static')
 
 # OR: Run dynamic dhn simulation for a time step t
