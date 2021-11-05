@@ -6,21 +6,17 @@ from dh_network_simulator import DHNetworkSimulator
 from dh_network_simulator.test import test_dir
 
 
-def test_pressure_drop_at_valves(plot_pressure_results_enabled=False,
+def test_pressure_drop_at_valves(plot_pressure_results_enabled=True,
                                  valves=['grid_v1', 'tank_v1', 'sub_v1', 'sub_v2'],
                                  controllers=['grid_ctrl', 'tank_ctrl', 'hex1_ctrl', 'hex2_ctrl']):
-    # Set simulation time
-    sim_period = range(0, 60*60*6, 60)
-
-    # Load simulator with network data
     dhn_sim = DHNetworkSimulator()
-    dhn_sim.load_network(from_file=True, path=test_dir+'/resources/pressure-test/', format='json_readable')
-    # dhn_sim.plot_network_topology()
+    dhn_sim.load_network(from_file=True, path=test_dir + '/resources/import/', format='json_readable')
+    inputs = outputs = pd.read_csv(test_dir + '/resources/pipeflow/dynamic-pipeflow-results.csv', index_col=[0])
 
-    # Load network control setpoints
-    inputs = pd.read_csv(test_dir+'/resources/pressure-test/static-pipeflow-results.csv', index_col=[0])
+    # set simulation period
+    sim_period = range(0, 60 * 60 * 11, 60)
 
-    # Init output data
+    # init results
     df_pressures = pd.DataFrame(columns=valves, index=sim_period)
     df_losscoeff = pd.DataFrame(columns=controllers, index=sim_period)
     df_reynolds = pd.DataFrame(columns=valves, index=sim_period)
@@ -30,36 +26,35 @@ def test_pressure_drop_at_valves(plot_pressure_results_enabled=False,
         # init
         _init_network_controls(dhn_sim, inputs, t)
         # run simulation
-        dhn_sim.run_simulation(t, sim_mode='static')
-        # collect outputs for pressures, loss coefficients and reynolds numbers
+        dhn_sim.run_simulation(t, sim_mode='dynamic')
+
+        # pressures
         for valve in valves:
             df_pressures[valve].loc[t] = dhn_sim.get_value_of_network_component(name=valve,
-                                                                        type='valve',
-                                                                        parameter='p_from_bar')
+                                                                                type='valve',
+                                                                                parameter='p_to_bar')
 
             df_mass_flows[valve].loc[t] = dhn_sim.get_value_of_network_component(name=valve,
-                                                                        type='valve',
-                                                                        parameter='mdot_from_kg_per_s')
+                                                                                 type='valve',
+                                                                                 parameter='mdot_from_kg_per_s')
 
             df_reynolds[valve].loc[t] = dhn_sim.get_value_of_network_component(name=valve,
-                                                                        type='valve',
-                                                                        parameter='reynolds')
+                                                                               type='valve',
+                                                                               parameter='reynolds')
 
         for controller in controllers:
             df_losscoeff[controller].loc[t] = dhn_sim.get_value_of_network_component(name=controller,
-                                                                            type='controller',
-                                                                            parameter='loss_coeff')
-
-    # Plot results
-    if plot_pressure_results_enabled == True:
+                                                                                     type='controller',
+                                                                                     parameter='loss_coeff')
+    if plot_pressure_results_enabled:
         df_pressures.plot(xlabel='Time (s)', ylabel='Pressure (bar)', title='Pressure flow at network valves')
         df_losscoeff.plot(xlabel='Time (s)', ylabel='Loss coefficient', title='Loss coefficients at network valves')
         df_reynolds.plot(xlabel='Time (s)', ylabel='Reynolds', title='Reynolds number at network valves')
         df_mass_flows.plot(xlabel='Time (s)', ylabel='mdot (kg/s)', title='Mass flows at network valves')
 
-    # assert if pressures at network valves are greater than the allowed minimum of 1.5bar
-    # p_min = 1.5
-    # assert df_pressures > p_min  TODO: Assert all pressures in the network!
+    # Set minimum system pressure
+    p_min = 0.5
+    assert all([val > p_min for val in df_pressures.values.ravel().tolist()])
 
 def _init_network_controls(dhn_sim, inputs, t):
     # Inputs
@@ -69,6 +64,7 @@ def _init_network_controls(dhn_sim, inputs, t):
     T_tank_forward = inputs['T_tank_forward'].loc[t]  # Supply temp of storage unit [degC]
     mdot_cons1_set = inputs['mdot_cons1_set'].loc[t]  # Mass flow at consumer 1 [kg/s]
     mdot_cons2_set = inputs['mdot_cons2_set'].loc[t]  # Mass flow at consumer 2 [kg/s]
+    mdot_bypass_set = 0.5  # Mass flow through bypass (const.) [kg/s]
     mdot_tank_in_set = inputs['mdot_tank_in_set'].loc[t]  # Mass flow injected in the tank [kg/s]
     mdot_tank_out_set = - mdot_tank_in_set  # Mass flow supplied by the tank [kg/s]
     mdot_grid_set = inputs['mdot_grid_set'].loc[t]
@@ -80,6 +76,11 @@ def _init_network_controls(dhn_sim, inputs, t):
                                            value=mdot_grid_set)
 
     # # Update controller(s)
+    dhn_sim.set_value_of_network_component(name='bypass_ctrl',
+                                           type='controller',
+                                           parameter='mdot_set_kg_per_s',
+                                           value=mdot_bypass_set)
+
     dhn_sim.set_value_of_network_component(name='hex1_ctrl',
                                            type='controller',
                                            parameter='mdot_set_kg_per_s',
@@ -122,7 +123,7 @@ def _init_network_controls(dhn_sim, inputs, t):
     dhn_sim.set_value_of_network_component(name='hp_evap',
                                            type='heat_exchanger',
                                            parameter='qext_w',
-                                           value=0)
+                                           value=Qdot_evap * 1000)
 
 if __name__ == '__main__':
     # init logging

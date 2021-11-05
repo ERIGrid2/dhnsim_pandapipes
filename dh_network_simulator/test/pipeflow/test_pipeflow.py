@@ -22,6 +22,17 @@ def test_dynamic_pipeflow():
     dhn_sim = DHNetworkSimulator()
     dhn_sim.load_network(from_file=True, path=test_dir+'/resources/import/', format='json_readable')
     inputs = outputs = pd.read_csv(test_dir+'/resources/pipeflow/dynamic-pipeflow-results.csv', index_col=[0])
+
+    # pressures
+    # Init output data
+    valves = ['grid_v1', 'tank_v1', 'sub_v1', 'sub_v2']
+    controllers = ['grid_ctrl', 'tank_ctrl', 'hex1_ctrl', 'hex2_ctrl']
+    sim_period = range(0, 60*60*3, 60)
+    df_pressures = pd.DataFrame(columns=valves, index=sim_period)
+    df_losscoeff = pd.DataFrame(columns=controllers, index=sim_period)
+    df_reynolds = pd.DataFrame(columns=valves, index=sim_period)
+    df_mass_flows = pd.DataFrame(columns=valves, index=sim_period)
+
     for t in range(0, 60*60*3, 60):
         # init
         _init_network_controls(dhn_sim, inputs, t)
@@ -30,6 +41,30 @@ def test_dynamic_pipeflow():
         # compare results with expected
         _assert_mass_flows(dhn_sim, outputs, t)
         # _assert_temperatures(dhn_sim, outputs, t) TODO: Assert temperatures
+
+        # pressures
+        for valve in valves:
+            df_pressures[valve].loc[t] = dhn_sim.get_value_of_network_component(name=valve,
+                                                                        type='valve',
+                                                                        parameter='p_to_bar')
+
+            df_mass_flows[valve].loc[t] = dhn_sim.get_value_of_network_component(name=valve,
+                                                                        type='valve',
+                                                                        parameter='mdot_from_kg_per_s')
+
+            df_reynolds[valve].loc[t] = dhn_sim.get_value_of_network_component(name=valve,
+                                                                        type='valve',
+                                                                        parameter='reynolds')
+
+        for controller in controllers:
+            df_losscoeff[controller].loc[t] = dhn_sim.get_value_of_network_component(name=controller,
+                                                                            type='controller',
+                                                                            parameter='loss_coeff')
+
+    df_pressures.plot(xlabel='Time (s)', ylabel='Pressure (bar)', title='Pressure flow at network valves')
+    df_losscoeff.plot(xlabel='Time (s)', ylabel='Loss coefficient', title='Loss coefficients at network valves')
+    df_reynolds.plot(xlabel='Time (s)', ylabel='Reynolds', title='Reynolds number at network valves')
+    df_mass_flows.plot(xlabel='Time (s)', ylabel='mdot (kg/s)', title='Mass flows at network valves')
 
 
 def _init_network_controls(dhn_sim, inputs, t):
