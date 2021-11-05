@@ -16,3 +16,4 @@ dh_network_simulator.egg-info/
 # Ignore test logging
 dh_network_simulator/test/pipeflow/dhn_sim_logging.log
 dh_network_simulator/test/pressure-test/dhn_sim_logging.log
+dh_network_simulator/tutorials/dhn_sim_logging.log
